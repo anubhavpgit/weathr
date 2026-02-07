@@ -1,3 +1,5 @@
+pub mod rain;
+pub mod raindrops;
 pub mod sunny;
 
 use crate::render::TerminalRenderer;

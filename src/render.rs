@@ -86,6 +86,17 @@ impl TerminalRenderer {
         Ok(())
     }
 
+    pub fn render_char(&mut self, x: u16, y: u16, ch: char, color: Color) -> io::Result<()> {
+        queue!(
+            self.stdout,
+            cursor::MoveTo(x, y),
+            SetForegroundColor(color),
+            Print(ch),
+            ResetColor
+        )?;
+        Ok(())
+    }
+
     pub fn flush(&mut self) -> io::Result<()> {
         self.stdout.flush()
     }
