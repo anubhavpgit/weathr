@@ -5,21 +5,41 @@ use crossterm::{
 };
 use std::io::{self, Stdout, Write};
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+struct Cell {
+    character: char,
+    color: Color,
+}
+
+impl Default for Cell {
+    fn default() -> Self {
+        Self {
+            character: ' ',
+            color: Color::Reset,
+        }
+    }
+}
+
 pub struct TerminalRenderer {
     stdout: Stdout,
     width: u16,
     height: u16,
+    buffer: Vec<Cell>,
+    last_buffer: Vec<Cell>,
 }
 
 impl TerminalRenderer {
     pub fn new() -> io::Result<Self> {
         let (width, height) = terminal::size()?;
         let stdout = io::stdout();
+        let buffer_size = (width as usize) * (height as usize);
 
         Ok(Self {
             stdout,
             width,
             height,
+            buffer: vec![Cell::default(); buffer_size],
+            last_buffer: vec![Cell::default(); buffer_size],
         })
     }
 
@@ -37,8 +57,14 @@ impl TerminalRenderer {
 
     pub fn update_size(&mut self) -> io::Result<()> {
         let (width, height) = terminal::size()?;
-        self.width = width;
-        self.height = height;
+        if width != self.width || height != self.height {
+            self.width = width;
+            self.height = height;
+            let buffer_size = (width as usize) * (height as usize);
+            self.buffer = vec![Cell::default(); buffer_size];
+            self.last_buffer = vec![Cell::default(); buffer_size];
+            execute!(self.stdout, Clear(ClearType::All))?;
+        }
         Ok(())
     }
 
@@ -47,7 +73,8 @@ impl TerminalRenderer {
     }
 
     pub fn clear(&mut self) -> io::Result<()> {
-        execute!(self.stdout, Clear(ClearType::All))
+        self.buffer.fill(Cell::default());
+        Ok(())
     }
 
     pub fn render_centered(&mut self, lines: &[String], start_row: u16) -> io::Result<()> {
@@ -59,11 +86,21 @@ impl TerminalRenderer {
         };
 
         for (idx, line) in lines.iter().enumerate() {
-            queue!(
-                self.stdout,
-                cursor::MoveTo(start_col as u16, start_row + idx as u16),
-                Print(line)
-            )?;
+            let row = start_row + idx as u16;
+            if row < self.height {
+                for (char_idx, ch) in line.chars().enumerate() {
+                    let col = start_col as u16 + char_idx as u16;
+                    if col < self.width {
+                        let buffer_idx = (row as usize) * (self.width as usize) + (col as usize);
+                        if buffer_idx < self.buffer.len() {
+                            self.buffer[buffer_idx] = Cell {
+                                character: ch,
+                                color: Color::Reset,
+                            };
+                        }
+                    }
+                }
+            }
         }
 
         Ok(())
@@ -76,29 +113,77 @@ impl TerminalRenderer {
         text: &str,
         color: Color,
     ) -> io::Result<()> {
-        queue!(
-            self.stdout,
-            cursor::MoveTo(x, y),
-            SetForegroundColor(color),
-            Print(text),
-            ResetColor
-        )?;
+        if y >= self.height {
+            return Ok(());
+        }
+
+        for (idx, ch) in text.chars().enumerate() {
+            let col = x + idx as u16;
+            if col < self.width {
+                let buffer_idx = (y as usize) * (self.width as usize) + (col as usize);
+                if buffer_idx < self.buffer.len() {
+                    self.buffer[buffer_idx] = Cell {
+                        character: ch,
+                        color,
+                    };
+                }
+            }
+        }
         Ok(())
     }
 
     pub fn render_char(&mut self, x: u16, y: u16, ch: char, color: Color) -> io::Result<()> {
-        queue!(
-            self.stdout,
-            cursor::MoveTo(x, y),
-            SetForegroundColor(color),
-            Print(ch),
-            ResetColor
-        )?;
+        if x < self.width && y < self.height {
+            let buffer_idx = (y as usize) * (self.width as usize) + (x as usize);
+            if buffer_idx < self.buffer.len() {
+                self.buffer[buffer_idx] = Cell {
+                    character: ch,
+                    color,
+                };
+            }
+        }
         Ok(())
     }
 
     pub fn flush(&mut self) -> io::Result<()> {
-        self.stdout.flush()
+        let mut current_color = Color::Reset;
+        let mut last_pos: Option<(u16, u16)> = None;
+
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let idx = (y as usize) * (self.width as usize) + (x as usize);
+
+                if idx >= self.buffer.len() || idx >= self.last_buffer.len() {
+                    continue;
+                }
+
+                let cell = self.buffer[idx];
+                let last_cell = self.last_buffer[idx];
+
+                if cell != last_cell {
+                    let expected_pos = last_pos.map(|(lx, ly)| (lx + 1, ly));
+                    if expected_pos != Some((x, y)) {
+                        queue!(self.stdout, cursor::MoveTo(x, y))?;
+                    }
+
+                    if cell.color != current_color {
+                        queue!(self.stdout, SetForegroundColor(cell.color))?;
+                        current_color = cell.color;
+                    }
+
+                    queue!(self.stdout, Print(cell.character))?;
+                    last_pos = Some((x, y));
+                }
+            }
+        }
+
+        if current_color != Color::Reset {
+            queue!(self.stdout, ResetColor)?;
+        }
+
+        self.stdout.flush()?;
+        self.last_buffer.copy_from_slice(&self.buffer);
+        Ok(())
     }
 }
 

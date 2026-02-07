@@ -1,3 +1,5 @@
+pub mod birds;
+pub mod clouds;
 pub mod rain;
 pub mod raindrops;
 pub mod sunny;
