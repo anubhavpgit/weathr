@@ -1,7 +1,8 @@
 [package]
 name = "weathr"
 version = "1.0.0"
-edition = "2021"
+edition = "2024"
+rust-version = "1.93.0"
 license = "GPL-3.0-or-later"
 authors = ["Dony Mulya <veirt@duck.com>"]
 description = "A terminal-based ASCII weather application with animated scenes driven by real-time weather data"
@@ -14,8 +15,22 @@ serde = { version = "1.0", features = ["derive"] }
 toml = "0.9"
 dirs = "6.0"
 crossterm = "0.29"
-tokio = { version = "1", features = ["rt-multi-thread", "sync", "time", "macros"] }
+tokio = { version = "1", features = [
+    "rt-multi-thread",
+    "sync",
+    "time",
+    "macros",
+] }
 reqwest = { version = "0.13", features = ["json"] }
 async-trait = "0.1"
 clap = { version = "4.5", features = ["derive"] }
-rand = "0.9.2"
+rand = "0.10"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.dev]
+opt-level = 1
