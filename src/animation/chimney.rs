@@ -100,3 +100,9 @@ impl ChimneySmoke {
         Ok(())
     }
 }
+
+impl Default for ChimneySmoke {
+    fn default() -> Self {
+        Self::new()
+    }
+}

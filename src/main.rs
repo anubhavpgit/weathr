@@ -107,12 +107,10 @@ async fn run_app(
 
     if simulate_condition.is_none() {
         let client = weather_client.clone();
-        let loc = location.clone();
-        let u = units.clone();
 
         tokio::spawn(async move {
             loop {
-                let result = client.get_current_weather(&loc, &u).await;
+                let result = client.get_current_weather(&location, &units).await;
                 if tx.send(result).await.is_err() {
                     break;
                 }

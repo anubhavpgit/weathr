@@ -15,8 +15,8 @@ pub struct WorldScene {
 
 impl WorldScene {
     pub fn new(width: u16, height: u16) -> Self {
-        let house = house::House::default();
-        let ground = ground::Ground::default();
+        let house = house::House;
+        let ground = ground::Ground;
         let decorations = decorations::Decorations::new();
 
         Self {

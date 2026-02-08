@@ -38,30 +38,7 @@ impl CloudSystem {
     }
 
     fn create_random_cloud(width: u16, height: u16, random_x: bool) -> Cloud {
-        let shapes = vec![
-            vec![
-                "   .--.   ".to_string(),
-                " .-(    ). ".to_string(),
-                "(___.__)_)".to_string(),
-            ],
-            vec![
-                "      _  _   ".to_string(),
-                "    ( `   )_ ".to_string(),
-                "   (    )    `)".to_string(),
-                "    \\_  (___  )".to_string(),
-            ],
-            vec![
-                "     .--.    ".to_string(),
-                "  .-(    ).  ".to_string(),
-                " (___.__)__) ".to_string(),
-            ],
-            vec![
-                "   _  _   ".to_string(),
-                "  ( `   )_ ".to_string(),
-                " (    )   `)".to_string(),
-                "  `--'     ".to_string(),
-            ],
-        ];
+        let shapes = Self::create_cloud_shapes();
 
         let shape_idx = (rand::random::<u32>() as usize) % shapes.len();
         let shape = shapes[shape_idx].clone();
@@ -86,6 +63,35 @@ impl CloudSystem {
         }
     }
 
+    fn create_cloud_shapes() -> Vec<Vec<String>> {
+        let shapes = [
+            vec![
+                "   .--.   ".to_string(),
+                " .-(    ). ".to_string(),
+                "(___.__)_)".to_string(),
+            ],
+            vec![
+                "      _  _   ".to_string(),
+                "    ( `   )_ ".to_string(),
+                "   (    )    `)".to_string(),
+                "    \\_  (___  )".to_string(),
+            ],
+            vec![
+                "     .--.    ".to_string(),
+                "  .-(    ).  ".to_string(),
+                " (___.__)__) ".to_string(),
+            ],
+            vec![
+                "   _  _   ".to_string(),
+                "  ( `   )_ ".to_string(),
+                " (    )   `)".to_string(),
+                "  `--'     ".to_string(),
+            ],
+        ];
+
+        shapes.to_vec()
+    }
+
     pub fn update(&mut self, terminal_width: u16, terminal_height: u16) {
         self.terminal_width = terminal_width;
         self.terminal_height = terminal_height;
@@ -95,14 +101,12 @@ impl CloudSystem {
         }
 
         self.clouds.retain(|c| c.x < terminal_width as f32);
-        if self.clouds.len() < (terminal_width / 20) as usize {
-            if rand::random::<f32>() < 0.005 {
-                self.clouds.push(Self::create_random_cloud(
-                    terminal_width,
-                    terminal_height,
-                    false,
-                ));
-            }
+        if self.clouds.len() < (terminal_width / 20) as usize && rand::random::<f32>() < 0.005 {
+            self.clouds.push(Self::create_random_cloud(
+                terminal_width,
+                terminal_height,
+                false,
+            ));
         }
     }
 

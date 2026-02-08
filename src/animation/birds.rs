@@ -41,19 +41,17 @@ impl BirdSystem {
         }
 
         self.birds.retain(|b| b.x < terminal_width as f32);
-        if self.birds.len() < 3 {
-            if rand::random::<f32>() < 0.01 {
-                let y = (rand::random::<u16>() % (terminal_height / 3)) as f32;
-                let speed = 0.2 + (rand::random::<f32>() * 0.2);
-                self.birds.push(Bird {
-                    x: 0.0,
-                    y,
-                    speed,
-                    character: 'v',
-                    flap_state: true,
-                    flap_timer: 0,
-                });
-            }
+        if self.birds.len() < 3 && rand::random::<f32>() < 0.01 {
+            let y = (rand::random::<u16>() % (terminal_height / 3)) as f32;
+            let speed = 0.2 + (rand::random::<f32>() * 0.2);
+            self.birds.push(Bird {
+                x: 0.0,
+                y,
+                speed,
+                character: 'v',
+                flap_state: true,
+                flap_timer: 0,
+            });
         }
     }
 

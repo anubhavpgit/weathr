@@ -2,7 +2,7 @@ use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Default)]
 pub struct Config {
     #[serde(default)]
     pub location: Location,
@@ -92,14 +92,6 @@ impl Config {
         };
 
         Ok(config_dir.join("weathr").join("config.toml"))
-    }
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            location: Location::default(),
-        }
     }
 }
 

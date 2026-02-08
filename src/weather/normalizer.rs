@@ -37,7 +37,7 @@ impl WeatherNormalizer {
             66 | 67 => WeatherCondition::FreezingRain,
             71 | 73 | 75 => WeatherCondition::Snow,
             77 => WeatherCondition::SnowGrains,
-            80 | 81 | 82 => WeatherCondition::RainShowers,
+            80..=82 => WeatherCondition::RainShowers,
             85 | 86 => WeatherCondition::SnowShowers,
             95 => WeatherCondition::Thunderstorm,
             96 | 99 => WeatherCondition::ThunderstormHail,

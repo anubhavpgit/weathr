@@ -35,7 +35,7 @@ impl StarSystem {
                 x: rand::random::<u16>() % terminal_width,
                 y: rand::random::<u16>() % (terminal_height / 2), // Upper half
                 brightness: rand::random::<f32>(),
-                phase: rand::random::<f32>() * 6.28,
+                phase: rand::random::<f32>() * std::f32::consts::TAU,
             });
         }
 
@@ -62,29 +62,21 @@ impl StarSystem {
             star.x += star.speed_x;
             star.y += star.speed_y;
 
-            if star.x < 0.0 || star.x >= terminal_width as f32 || star.y >= terminal_height as f32 {
-                star.active = false;
-            }
-        } else {
-            if rand::random::<f32>() < 0.005 {
-                let start_x = (rand::random::<u16>() % (terminal_width / 2)) + (terminal_width / 4);
-                let start_y = rand::random::<u16>() % (terminal_height / 4);
-
-                self.shooting_star = Some(ShootingStar {
-                    x: start_x as f32,
-                    y: start_y as f32,
-                    speed_x: if rand::random::<bool>() { 1.5 } else { -1.5 },
-                    speed_y: 0.5 + (rand::random::<f32>() * 0.5),
-                    length: 5,
-                    active: true,
-                });
-            }
-        }
-
-        if let Some(star) = &self.shooting_star {
-            if !star.active {
+            if star.x < 0.0 || star.y as u16 >= terminal_height || star.length == 0 {
                 self.shooting_star = None;
             }
+        } else if rand::random::<f32>() < 0.005 {
+            let start_x = (rand::random::<u16>() % (terminal_width / 2)) + (terminal_width / 4);
+            let start_y = rand::random::<u16>() % (terminal_height / 4);
+
+            self.shooting_star = Some(ShootingStar {
+                x: start_x as f32,
+                y: start_y as f32,
+                speed_x: if rand::random::<bool>() { 1.5 } else { -1.5 },
+                speed_y: 0.5 + (rand::random::<f32>() * 0.5),
+                length: 5,
+                active: true,
+            });
         }
     }
 

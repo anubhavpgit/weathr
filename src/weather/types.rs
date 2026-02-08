@@ -56,36 +56,27 @@ impl WeatherCondition {
     }
 
     pub fn is_raining(&self) -> bool {
-        match self {
+        matches!(
+            self,
             Self::Drizzle
-            | Self::Rain
-            | Self::RainShowers
-            | Self::FreezingRain
-            | Self::Thunderstorm
-            | Self::ThunderstormHail => true,
-            _ => false,
-        }
+                | Self::Rain
+                | Self::RainShowers
+                | Self::FreezingRain
+                | Self::Thunderstorm
+                | Self::ThunderstormHail
+        )
     }
 
     pub fn is_snowing(&self) -> bool {
-        match self {
-            Self::Snow | Self::SnowGrains | Self::SnowShowers => true,
-            _ => false,
-        }
+        matches!(self, Self::Snow | Self::SnowGrains | Self::SnowShowers)
     }
 
     pub fn is_thunderstorm(&self) -> bool {
-        match self {
-            Self::Thunderstorm | Self::ThunderstormHail => true,
-            _ => false,
-        }
+        matches!(self, Self::Thunderstorm | Self::ThunderstormHail)
     }
 
     pub fn is_cloudy(&self) -> bool {
-        match self {
-            Self::PartlyCloudy | Self::Cloudy | Self::Overcast => true,
-            _ => false,
-        }
+        matches!(self, Self::PartlyCloudy | Self::Cloudy | Self::Overcast)
     }
 }
 
