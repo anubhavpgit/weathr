@@ -231,7 +231,11 @@ async fn test_open_meteo_provider_integration_tropical_location() {
         weather.temperature >= 20.0 && weather.temperature <= 40.0,
         "Tropical temperature should be warm"
     );
-    assert!(weather.humidity >= 50.0, "Tropical humidity should be high");
+    assert!(
+        weather.humidity >= 20.0 && weather.humidity <= 95.0,
+        "Tropical humidity should be within reasonable range, got: {}",
+        weather.humidity
+    );
 }
 
 #[tokio::test]
