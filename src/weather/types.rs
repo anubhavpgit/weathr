@@ -166,11 +166,26 @@ pub struct WeatherData {
     pub timestamp: String,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, serde::Deserialize)]
+#[serde(default)]
 pub struct WeatherUnits {
     pub temperature: TemperatureUnit,
     pub wind_speed: WindSpeedUnit,
     pub precipitation: PrecipitationUnit,
+}
+
+impl WeatherUnits {
+    pub fn imperial() -> Self {
+        Self {
+            temperature: TemperatureUnit::Fahrenheit,
+            wind_speed: WindSpeedUnit::Mph,
+            precipitation: PrecipitationUnit::Inch,
+        }
+    }
+
+    pub fn metric() -> Self {
+        Self::default()
+    }
 }
 
 impl Default for WeatherUnits {

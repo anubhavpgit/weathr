@@ -1,12 +1,19 @@
 # weathr
 
-A terminal weather app with ASCII animations.
+[![Crates.io](https://img.shields.io/crates/v/weathr.svg)](https://crates.io/crates/weathr)
+[![Downloads](https://img.shields.io/crates/d/weathr.svg)](https://crates.io/crates/weathr)
+[![License](https://img.shields.io/crates/l/weathr.svg)](https://github.com/veirt/weathr/blob/main/LICENSE)
+
+A terminal weather app with ASCII animations driven by real-time weather data.
+
+Features real-time weather from Open-Meteo with animated rain, snow, thunderstorms, flying airplanes, day/night cycles, and auto-location detection.
 
 ## Contents
 
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
+- [Privacy](#privacy)
 - [License](#license)
 
 ## Installation
@@ -53,6 +60,16 @@ auto = false
 
 # Hide the location name in the UI
 hide = false
+
+[units]
+# Temperature unit: "celsius" or "fahrenheit"
+temperature = "celsius"
+
+# Wind speed unit: "kmh", "ms", "mph", or "kn"
+wind_speed = "kmh"
+
+# Precipitation unit: "mm" or "inch"
+precipitation = "mm"
 ```
 
 ### Example Locations
@@ -69,11 +86,83 @@ longitude = 151.2093
 
 ## Usage
 
-Run:
+Run with real-time weather:
 
 ```bash
 weathr
 ```
+
+### CLI Options
+
+Simulate weather conditions for testing:
+
+```bash
+# Simulate rain
+weathr --simulate rain
+
+# Simulate snow at night
+weathr --simulate snow --night
+
+# Clear day with falling leaves
+weathr --simulate clear --leaves
+```
+
+Available weather conditions:
+
+- Clear Skies: `clear`, `partly-cloudy`, `cloudy`, `overcast`
+- Precipitation: `fog`, `drizzle`, `rain`, `freezing-rain`, `rain-showers`
+- Snow: `snow`, `snow-grains`, `snow-showers`
+- Storms: `thunderstorm`, `thunderstorm-hail`
+
+Override configuration:
+
+```bash
+# Use imperial units (°F, mph, inch)
+weathr --imperial
+
+# Use metric units (°C, km/h, mm) - default
+weathr --metric
+
+# Auto-detect location via IP
+weathr --auto-location
+
+# Hide location coordinates
+weathr --hide-location
+
+# Hide status HUD
+weathr --hide-hud
+
+# Combine flags
+weathr --imperial --auto-location
+```
+
+### Keyboard Controls
+
+- `q` or `Q` - Quit
+- `Ctrl+C` - Exit
+
+### Environment Variables
+
+The application respects several environment variables:
+
+- `NO_COLOR` - When set, disables all color output (accessibility feature)
+- `COLORTERM` - Detects truecolor support (values: "truecolor", "24bit")
+- `TERM` - Used for terminal capability detection (e.g., "xterm-256color")
+
+Examples:
+
+```bash
+# Disable colors for accessibility
+NO_COLOR=1 weathr
+```
+
+## Privacy
+
+### Location Detection
+
+When using `auto = true` in config or the `--auto-location` flag, the application makes a request to `ipinfo.io` to detect your approximate location based on your IP address.
+
+This is optional. You can disable auto-location and manually specify coordinates in your config file to avoid external API calls.
 
 ## License
 
@@ -82,9 +171,10 @@ GPL-3.0-or-later
 ## Credits
 
 ### ASCII Art
+
 - **Source**: https://www.asciiart.eu/
 - **House**: Joan G. Stark
 - **Sun**: Hayley Jane Wakenshaw (Flump)
 - **Moon**: Joan G. Stark
 
-*Note: If any ASCII art is uncredited or misattributed, it belongs to the original owner.*
+_Note: If any ASCII art is uncredited or misattributed, it belongs to the original owner._

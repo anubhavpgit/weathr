@@ -2,12 +2,16 @@ use serde::Deserialize;
 use std::fs;
 use std::path::PathBuf;
 
+use crate::weather::types::WeatherUnits;
+
 #[derive(Deserialize, Debug, Default, Clone)]
 pub struct Config {
     #[serde(default)]
     pub location: Location,
     #[serde(default)]
     pub hide_hud: bool,
+    #[serde(default)]
+    pub units: WeatherUnits,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -229,6 +233,7 @@ longitude = 0.0
                 hide: false,
             },
             hide_hud: false,
+            units: WeatherUnits::default(),
         };
         let result = config.validate();
         assert!(result.is_err());
@@ -245,6 +250,7 @@ longitude = 0.0
                 hide: false,
             },
             hide_hud: false,
+            units: WeatherUnits::default(),
         };
         let result = config.validate();
         assert!(result.is_err());
@@ -261,6 +267,7 @@ longitude = 0.0
                 hide: false,
             },
             hide_hud: false,
+            units: WeatherUnits::default(),
         };
         let result = config.validate();
         assert!(result.is_err());
@@ -277,6 +284,7 @@ longitude = 0.0
                 hide: false,
             },
             hide_hud: false,
+            units: WeatherUnits::default(),
         };
         let result = config.validate();
         assert!(result.is_err());
@@ -293,8 +301,58 @@ longitude = 0.0
                 hide: false,
             },
             hide_hud: false,
+            units: WeatherUnits::default(),
         };
         let result = config.validate();
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_config_units_default() {
+        let toml_content = r#"
+[location]
+latitude = 0.0
+longitude = 0.0
+"#;
+        let config: Config = toml::from_str(toml_content).unwrap();
+        assert_eq!(
+            config.units.temperature,
+            crate::weather::types::TemperatureUnit::Celsius
+        );
+        assert_eq!(
+            config.units.wind_speed,
+            crate::weather::types::WindSpeedUnit::Kmh
+        );
+        assert_eq!(
+            config.units.precipitation,
+            crate::weather::types::PrecipitationUnit::Mm
+        );
+    }
+
+    #[test]
+    fn test_config_units_custom() {
+        let toml_content = r#"
+[location]
+latitude = 0.0
+longitude = 0.0
+
+[units]
+temperature = "fahrenheit"
+wind_speed = "mph"
+precipitation = "inch"
+"#;
+        let config: Config = toml::from_str(toml_content).unwrap();
+        assert_eq!(
+            config.units.temperature,
+            crate::weather::types::TemperatureUnit::Fahrenheit
+        );
+        assert_eq!(
+            config.units.wind_speed,
+            crate::weather::types::WindSpeedUnit::Mph
+        );
+        assert_eq!(
+            config.units.precipitation,
+            crate::weather::types::PrecipitationUnit::Inch
+        );
     }
 }

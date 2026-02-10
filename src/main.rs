@@ -47,6 +47,20 @@ struct Cli {
 
     #[arg(long, help = "Hide HUD (status line)")]
     hide_hud: bool,
+
+    #[arg(
+        long,
+        conflicts_with = "metric",
+        help = "Use imperial units (°F, mph, inch)"
+    )]
+    imperial: bool,
+
+    #[arg(
+        long,
+        conflicts_with = "imperial",
+        help = "Use metric units (°C, km/h, mm)"
+    )]
+    metric: bool,
 }
 
 #[tokio::main]
@@ -127,6 +141,12 @@ async fn main() -> io::Result<()> {
     }
     if cli.hide_hud {
         config.hide_hud = true;
+    }
+    if cli.imperial {
+        config.units = weather::WeatherUnits::imperial();
+    }
+    if cli.metric {
+        config.units = weather::WeatherUnits::metric();
     }
 
     // Auto-detect location if enabled

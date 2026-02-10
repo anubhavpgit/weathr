@@ -4,7 +4,7 @@ use crate::config::Config;
 use crate::render::TerminalRenderer;
 use crate::scene::WorldScene;
 use crate::weather::{
-    OpenMeteoProvider, WeatherClient, WeatherCondition, WeatherData, WeatherLocation, WeatherUnits,
+    OpenMeteoProvider, WeatherClient, WeatherCondition, WeatherData, WeatherLocation,
 };
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use std::io;
@@ -131,7 +131,7 @@ impl App {
         } else {
             let provider = Arc::new(OpenMeteoProvider::new());
             let weather_client = WeatherClient::new(provider, REFRESH_INTERVAL);
-            let units = WeatherUnits::default();
+            let units = config.units;
 
             tokio::spawn(async move {
                 loop {
