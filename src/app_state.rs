@@ -123,7 +123,7 @@ impl AppState {
         if let Some(ref weather) = self.current_weather {
             matches!(
                 weather.condition,
-                WeatherCondition::Clear | WeatherCondition::PartlyCloudy
+                WeatherCondition::Clear | WeatherCondition::PartlyCloudy | WeatherCondition::Cloudy
             )
         } else {
             false
