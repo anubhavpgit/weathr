@@ -39,3 +39,10 @@ strip = true
 
 [profile.dev]
 opt-level = 1
+
+[profile.profiling]
+inherits = "release"
+debug = 2
+strip = false
+lto = false
+opt-level = 2
