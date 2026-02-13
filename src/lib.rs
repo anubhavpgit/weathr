@@ -1,4 +1,6 @@
 pub mod animation;
+pub mod animation_manager;
+pub mod app_state;
 pub mod cache;
 pub mod config;
 pub mod error;
